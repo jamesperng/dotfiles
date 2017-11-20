@@ -43,7 +43,7 @@ GEAR="\u2699"
 # load scm_prompt
 export WANT_OLD_SCM_PROMPT=true
 setopt PROMPT_SUBST
-source /home/$USER/.scm-prompt
+source /Users/$USER/.scm-prompt
 
 # Begin a segment
 # Takes two arguments, background and foreground. Both can be omitted,
