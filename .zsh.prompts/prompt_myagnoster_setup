@@ -22,9 +22,6 @@
 # jobs are running in this shell will all be displayed automatically when
 # appropriate.
 
-# Load dependencies.
-pmodload 'helper'
-
 ### Segment drawing
 # A few utility functions to make it easy and re-usable to draw segmented prompts
 
@@ -39,11 +36,6 @@ DETACHED="\u27a6"
 CROSS="\u2718"
 LIGHTNING="\u26a1"
 GEAR="\u2699"
-
-# load scm_prompt
-export WANT_OLD_SCM_PROMPT=true
-setopt PROMPT_SUBST
-source /Users/$USER/.scm-prompt
 
 # Begin a segment
 # Takes two arguments, background and foreground. Both can be omitted,
@@ -109,42 +101,6 @@ prompt_git() {
   fi
 }
 
-
-
-# Mercurial: bookmark
-prompt_hg() {
-  if [ -n "$_hg_info" ]; then
-    color=green
-    prompt_segment $color $PRIMARY_FG
-    print -n " ☿ ${_hg_info} "
-  fi
-}
-
-prompt_paymahn_hg_info() {
-  if (( _prompt_paymahn_precmd_async_pid > 0)); then
-    # Reset PID
-    _prompt_paymahn_precmd_async_pid=0
-    _hg_info=$(_dotfiles_scm_info)
-    # Redisplay prompt.
-    zle && zle reset_prompt
-  fi
-}
-
-prompt_paymahn_precmd_async() {
-  # Signal completion to parent process.
-  kill -WINCH $$
-}
-
-paymahn_func() {
-  _hg_info=""
-  # Kill the old process of slow commands if it is still running.
-  if (( _prompt_paymahn_precmd_async_pid > 0)); then
-    kill -KILL "$_prompt_paymahn_precmd_async_pid" &>/dev/null
-  fi
-  trap prompt_paymahn_hg_info WINCH
-  prompt_paymahn_precmd_async &! _prompt_paymahn_precmd_async_pid=$!
-}
-
 # Dir: current working directory
 prompt_dir() {
   prompt_segment blue $PRIMARY_FG ' %~ '
@@ -172,7 +128,6 @@ prompt_agnoster_main() {
   prompt_context
   prompt_dir
   prompt_git
-  prompt_hg
   prompt_end
 }
 
@@ -188,7 +143,6 @@ prompt_agnoster_setup() {
   prompt_opts=(cr subst percent)
 
   add-zsh-hook precmd prompt_agnoster_precmd
-  add-zsh-hook precmd paymahn_func
 
   zstyle ':vcs_info:*' enable git
   zstyle ':vcs_info:*' check-for-changes false
